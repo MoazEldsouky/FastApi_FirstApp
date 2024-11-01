@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحليل المشاعر للمراجعات</title>
+    <style>
+        body {
+            direction: rtl;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #4A90E2;
+            font-size: 1.8em;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1em;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 1em;
+            outline: none;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            background-color: #4A90E2;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background-color: #357ABD;
+        }
+
+        #results {
+            margin-top: 1.5rem;
+            font-size: 1.1em;
+        }
+
+        #results p {
+            margin: 0.5rem 0;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .result-label {
+            color: #4A90E2;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .footer a {
+            color: #4A90E2;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>تحليل المشاعر للمراجعات</h1>
+        <p>هذه الأداة تستخدم نموذجًا تم تدريبه لتحليل المشاعر للمراجعات المكتوبة باللغة العربية. أدخل المراجعة وانقر على "تحليل" لرؤية نتائج التوقعات:</p>
+
+        <textarea id="review" placeholder="اكتب المراجعة هنا"></textarea><br>
+        <button onclick="analyzeSentiment()">تحليل</button>
+
+        <div id="results"></div>
+
+        <div class="footer">
+            <p>تم تدريب هذا النموذج بواسطة <strong>معاذ الدسوقي</strong>. يمكنك معرفة المزيد عني هنا:</p>
+            <p>GitHub: <a href="https://github.com/MoazEldsouky" target="_blank">GitHub Profile</a></p>
+            <p>LinkedIn: <a href="https://www.linkedin.com/in/moaz-eldesouky-762288251/" target="_blank">LinkedIn Profile</a></p>
+            <p>Kaggle: <a href="https://www.kaggle.com/moazeldsokyx" target="_blank">Kaggle Profile</a></p>
+            <p>Email: <a href="mailto:moazeldsoky8@gmail.com">moazeldsoky8@gmail.com</a></p>
+        </div>
+    </div>
+
+    <script>
+        async function analyzeSentiment() {
+            const review = document.getElementById("review").value;
+            const resultsDiv = document.getElementById("results");
+
+            resultsDiv.innerHTML = "";  // Clear previous results
+
+            if (!review.trim()) {
+                resultsDiv.innerHTML = "<p class='error'>يرجى إدخال المراجعة</p>";
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/Sentiment_analysis_ar?review=" + encodeURIComponent(review));
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <p><span class="result-label">إيجابي:</span> ${data["إيجابي"].toFixed(2)}</p>
+                        <p><span class="result-label">سلبي:</span> ${data["سلبي"].toFixed(2)}</p>
+                        <p>النسبة الأعلى تشير إلى الاحتمال الأقرب لتقييم المشاعر للمراجعة المدخلة.</p>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = "<p class='error'>حدث خطأ أثناء معالجة الطلب.</p>";
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = "<p class='error'>تعذر الوصول إلى الخدمة. يرجى المحاولة لاحقًا.</p>";
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
